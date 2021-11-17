@@ -1,7 +1,5 @@
 from transformers import TrainingArguments, Trainer
 from transformers import DataCollatorForLanguageModeling
-import torch
-torch.cuda.is_available()
 
 def train(tokenizer, model, dataset, save_dir, mlm_prob=0.15):
     model.train()
@@ -11,7 +9,7 @@ def train(tokenizer, model, dataset, save_dir, mlm_prob=0.15):
         num_train_epochs = 5,
         per_device_train_batch_size = 4,
         save_steps = 10000,
-        save_total_limit = 1,
+        save_total_limit = 3,
     )
     
     data_collator = DataCollatorForLanguageModeling(

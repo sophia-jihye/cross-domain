@@ -3,7 +3,6 @@ import os
 import pandas as pd
 from tqdm import tqdm
 tqdm.pandas()
-import torch
 
 from transformers_helper import load_tokenizer_and_model
 from LazyLineByLineTextDataset import LazyLineByLineTextDataset
@@ -19,8 +18,6 @@ def main(model_name_or_dir, post_filepath, save_dir):
     post_training_mlm.train(tokenizer, model, dataset, save_dir)
     
 if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # Use GPU
-    print('NOW USING {}'.format(device))
     model_name_or_dir = 'distilbert-base-uncased'
     
     for post_filepath in filepaths:
