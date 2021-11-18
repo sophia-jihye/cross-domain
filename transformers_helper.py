@@ -1,6 +1,6 @@
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer, AutoModelForMaskedLM
 
-def load_tokenizer_and_model(model_name_or_path, num_labels=None, mode='classification'):
+def load_tokenizer_and_model(model_name_or_path, num_classes=None, mode='classification'):
     if num_labels is not None: # train
         config = AutoConfig.from_pretrained(model_name_or_path, num_labels=num_labels)
     else: # test

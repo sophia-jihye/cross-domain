@@ -3,16 +3,16 @@ from glob import glob
 import pandas as pd
 
 from transformers_helper import load_tokenizer_and_model
-from CustomDataset import CustomDataset, encode_for_inference
-import finetuning_classification, reports
+from CustomDataset import CustomDataset
+import finetuning_classification
 
 train_filepaths = glob('/media/dmlab/My Passport/DATA/cross-domain/train&val/*_train.json')
 val_filepath_format = '/media/dmlab/My Passport/DATA/cross-domain/train&val/{}_val.json'
 parent_save_dir = '/media/dmlab/My Passport/DATA/cross-domain/finetune'
 if not os.path.exists(parent_save_dir): os.makedirs(parent_save_dir)
 
-def main(model_name_or_dir, train_texts, train_labels, val_texts, val_labels, save_dir):
-    tokenizer, model = load_tokenizer_and_model(model_name_or_dir, mode='classification')
+def main(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir):
+    tokenizer, model = load_tokenizer_and_model(model_name_or_dir, num_classes=num_classes, mode='classification')
     
     print('Getting data..\n')
     train_dataset = CustomDataset(tokenizer, train_texts, train_labels)
@@ -24,6 +24,7 @@ def main(model_name_or_dir, train_texts, train_labels, val_texts, val_labels, sa
 if __name__=='__main__':
     model_name_or_dir = 'distilbert-base-uncased'
     relabel_dict = {'negative':0, 'positive':1}
+    num_classes = 2
     
     for train_filepath in train_filepaths:
         for mode in ['unk', 'raw']:
@@ -41,4 +42,4 @@ if __name__=='__main__':
                 train_texts, val_texts = train_df['text'].values, val_df['text'].values
 
             train_labels, val_labels = train_df['label'].values, val_df['label'].values
-            main(model_name_or_dir, train_texts, train_labels, val_texts, val_labels, save_dir)
+            main(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
