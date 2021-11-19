@@ -23,7 +23,6 @@ def main(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, v
     tokenizer.save_pretrained(save_dir)
     
 if __name__=='__main__':
-#     model_name_or_dir = 'distilbert-base-uncased'
     relabel_dict = {'negative':0, 'positive':1}
     num_classes = 2
     

@@ -16,14 +16,32 @@ def main(docs, save_filepath):
     print(f'Created {save_filepath}')
         
 if __name__ == '__main__':
-    all_df = pd.read_json(keyword_masked_filepath)[['domain', 'masked_text']]
+    mode = 'raw'
+    
+    all_df = pd.read_json(keyword_masked_filepath)[['domain', 'text', 'masked_text']]
     all_df = shuffle(all_df)
     domains = all_df.domain.unique()
     
     for (domain1, domain2) in list(combinations(domains, 2)):
         df = all_df[all_df['domain'].isin([domain1, domain2])]
-        docs = df['masked_text'].values
+        if mode == 'unk':
+            docs = df['masked_text'].values
+        elif mode == 'raw':
+            docs = df['text'].values
         
         print('Creating dataset for {}&{}..'.format(domain1, domain2))
-        save_filepath = os.path.join(save_dir, 'MDSD_{}_for_post.txt'.format('&'.join([domain1, domain2])))
+        save_filepath = os.path.join(save_dir, 'MDSD_{}_{}_for_post.txt'.format('&'.join([domain1, domain2]), mode))
         main(docs, save_filepath)
+        
+    # ONE DOMAIN ONLY. (For experiment to check upper limit in the k-fold setting)
+    for mode in ['unk', 'raw']:
+        for domain1 in domains:
+            df = all_df[all_df['domain'].isin([domain1])]
+            if mode == 'unk':
+                docs = df['masked_text'].values
+            elif mode == 'raw':
+                docs = df['text'].values
+
+            print('Creating dataset for {}..'.format(domain1))
+            save_filepath = os.path.join(save_dir, 'MDSD_{}_{}_for_post.txt'.format(domain1, mode))
+            main(docs, save_filepath)
