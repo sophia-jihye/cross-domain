@@ -9,8 +9,8 @@ from CustomDataset import encode_for_inference
 import finetuning_classification, reports
 
 test_filepath = '/media/dmlab/My Passport/DATA/cross-domain/MDSD_masked.json'
-finetune_unk_dirs = glob('/media/dmlab/My Passport/DATA/cross-domain/finetune_using_post-trained/source=*_unk_post=*')
-parent_save_dir = '/media/dmlab/My Passport/DATA/cross-domain/test_using_post-trained'
+finetune_unk_dirs = glob('/media/dmlab/My Passport/DATA/cross-domain/finetune_using_post-trained_raw/source=*_unk_post=*')
+parent_save_dir = '/media/dmlab/My Passport/DATA/cross-domain/test_using_post-trained_raw'
 
 def main(device, model_name_or_dir, df, save_dir):
     tokenizer, model = load_tokenizer_and_model(model_name_or_dir, mode='classification')

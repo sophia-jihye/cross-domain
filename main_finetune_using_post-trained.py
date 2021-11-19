@@ -6,10 +6,10 @@ from transformers_helper import load_tokenizer_and_model
 from CustomDataset import CustomDataset
 import finetuning_classification
 
-post_trained_dirs = [d for d in glob('/media/dmlab/My Passport/DATA/cross-domain/post-train/*') if os.path.isdir(d)]
+post_trained_dirs = [d for d in glob('/media/dmlab/My Passport/DATA/cross-domain/post-train/*&*_raw') if os.path.isdir(d)]
 train_filepaths = glob('/media/dmlab/My Passport/DATA/cross-domain/train&val/*_train.json')
 val_filepath_format = '/media/dmlab/My Passport/DATA/cross-domain/train&val/{}_val.json'
-parent_save_dir = '/media/dmlab/My Passport/DATA/cross-domain/finetune_using_post-trained'
+parent_save_dir = '/media/dmlab/My Passport/DATA/cross-domain/finetune_using_post-trained_raw'
 if not os.path.exists(parent_save_dir): os.makedirs(parent_save_dir)
 
 def main(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir):
