@@ -27,5 +27,7 @@ if __name__ == '__main__':
         _, domain, mode, _, _ = os.path.basename(post_filepath).split('_')
         save_dir = os.path.join(post_parent_save_dir, '{}_{}'.format(domain, mode))
         if not os.path.exists(save_dir): os.makedirs(save_dir)
-        if save_dir in TEMP_ALREADY_COMPLETED_DIRS: continue   # SKIP completed items.
+        if os.path.basename(save_dir) in TEMP_ALREADY_COMPLETED_DIRS: 
+            print('SKIP {}'.format(os.path.basename(save_dir)))
+            continue   # SKIP completed items.
         start_post_train(model_name_or_dir, post_filepath, save_dir)
