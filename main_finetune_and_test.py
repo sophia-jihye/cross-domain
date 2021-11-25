@@ -9,6 +9,8 @@ from transformers_helper import load_tokenizer_and_model
 from CustomDataset import CustomDataset, encode_for_inference
 import finetuning_classification, reports
 
+TEMP_ALREADY_COMPLETED_ITEMS = True 
+
 post_trained_dirs = [d for d in glob('/data/jihye_data/cross-domain/data/post-train/*&*_*') if os.path.isdir(d)]
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 finetune_parent_save_dir = '/data/jihye_data/cross-domain/finetune_{}'
@@ -89,28 +91,30 @@ if __name__ == '__main__':
     ##########################
     ###### No post-train #####
     ##########################
-    model_name_or_dir = 'bert-base-uncased'
-    for finetune_idx in range(5):
-        for source_domain in labeled_df['domain'].unique():
-            for test_domain in [d for d in labeled_df['domain'].unique() if d != source_domain]:
-                
-                save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
-                if not os.path.exists(save_dir): os.makedirs(save_dir)
+    if not TEMP_ALREADY_COMPLETED_ITEMS:   # TEMP: no_pt 12개 실험 완료 했으므로 아래 내용 SKIP
+    
+        model_name_or_dir = 'bert-base-uncased'
+        for finetune_idx in range(5):
+            for source_domain in labeled_df['domain'].unique():
+                for test_domain in [d for d in labeled_df['domain'].unique() if d != source_domain]:
 
-                source_df = labeled_df[labeled_df['domain']==source_domain]
-                
-                # In each fold, 1600 balanced samples are randomly selected from the labeled data for training and the rest 400 for validation.
-                train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, stratify=source_df['label'].values)
+                    save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
+                    if not os.path.exists(save_dir): os.makedirs(save_dir)
 
-                # (Raw source data)
-                train_texts, val_texts = train_df['text'].values, val_df['text'].values
-                train_labels, val_labels = train_df['label'].values, val_df['label'].values
-                
-                start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
-                
-                # Test (Raw target data)
-                test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
-                test_df.columns = ['text', 'true_label']
-                
-                start_test(device, save_dir, test_df, save_dir)
+                    source_df = labeled_df[labeled_df['domain']==source_domain]
+
+                    # In each fold, 1600 balanced samples are randomly selected from the labeled data for training and the rest 400 for validation.
+                    train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, stratify=source_df['label'].values)
+
+                    # (Raw source data)
+                    train_texts, val_texts = train_df['text'].values, val_df['text'].values
+                    train_labels, val_labels = train_df['label'].values, val_df['label'].values
+
+                    start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
+
+                    # Test (Raw target data)
+                    test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+                    test_df.columns = ['text', 'true_label']
+
+                    start_test(device, save_dir, test_df, save_dir)
             
