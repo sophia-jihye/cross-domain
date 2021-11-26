@@ -4,6 +4,7 @@ from tqdm import tqdm
 tqdm.pandas()
 import pandas as pd
 import os, torch, copy
+import numpy as np
 
 from transformers_helper import load_tokenizer_and_model
 from CustomDataset import CustomDataset, encode_for_inference
@@ -14,6 +15,7 @@ TEMP_ALREADY_COMPLETED_ITEMS = True
 post_trained_dirs = [d for d in glob('/data/jihye_data/cross-domain/data/post-train/*&*_*') if os.path.isdir(d)]
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 finetune_parent_save_dir = '/data/jihye_data/cross-domain/finetune_{}'
+kfold_num = 1
 
 def start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir):
     tokenizer, model = load_tokenizer_and_model(model_name_or_dir, num_classes=num_classes, mode='classification')
@@ -59,7 +61,7 @@ if __name__ == '__main__':
     ####################################        
     # For each task, we employ a 5-fold cross-validation protocol
     # The results we report are the averaged performance of each model across these 5 folds.
-    for finetune_idx in range(5):
+    for finetune_idx in range(kfold_num):
         for source_domain in labeled_df['domain'].unique():
             
             model_name_or_dirs = [d for d in post_trained_dirs if source_domain in d]
@@ -74,7 +76,7 @@ if __name__ == '__main__':
                 source_df = labeled_df[labeled_df['domain']==source_domain]
                 
                 # In each fold, 1600 balanced samples are randomly selected from the labeled data for training and the rest 400 for validation.
-                train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, stratify=source_df['label'].values)
+                train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
 
                 # (Raw source data)
                 train_texts, val_texts = train_df['text'].values, val_df['text'].values
@@ -94,7 +96,7 @@ if __name__ == '__main__':
     if not TEMP_ALREADY_COMPLETED_ITEMS:   # TEMP: no_pt 12개 실험 완료 했으므로 아래 내용 SKIP
     
         model_name_or_dir = 'bert-base-uncased'
-        for finetune_idx in range(5):
+        for finetune_idx in range(kfold_num):
             for source_domain in labeled_df['domain'].unique():
                 for test_domain in [d for d in labeled_df['domain'].unique() if d != source_domain]:
 
