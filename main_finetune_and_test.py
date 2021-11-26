@@ -13,7 +13,8 @@ import finetuning_classification, reports
 post_trained_dirs = [d for d in glob('/data/jihye_data/cross-domain/post-train/*&*_*') if os.path.isdir(d)]
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 finetune_parent_save_dir = '/data/jihye_data/cross-domain/finetune_{}'
-kfold_num = 1
+kfold_num = 5
+finetuning_mode = 'RAW'   # RAW, UNK
 
 def start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir):
     tokenizer, model = load_tokenizer_and_model(model_name_or_dir, num_classes=num_classes, mode='classification')
@@ -49,7 +50,6 @@ def start_test(device, model_name_or_dir, df, save_dir):
     
 if __name__ == '__main__':        
 
-    finetuning_mode = 'UNK'   # RAW
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     relabel_dict, num_classes = {'negative':0, 'positive':1}, 2
     labeled_df = pd.read_json(mdsd_labeled_filepath)
