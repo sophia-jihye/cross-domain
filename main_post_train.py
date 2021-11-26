@@ -6,8 +6,6 @@ from LazyLineByLineTextDataset import LazyLineByLineTextDataset
 from transformers_helper import load_tokenizer_and_model
 import post_training_mlm
 
-TEMP_ALREADY_COMPLETED_DIRS = ['books&dvd_raw', 'books&electronics_random', 'books&kitchen_raw', 'dvd&electronics_random', 'dvd&electronics_raw', 'dvd&kitchen_keyword', 'electronics&kitchen_raw']
-
 post_filepaths = glob('/data/jihye_data/cross-domain/data/MDSD_*&*_*_for_post.txt')
 post_parent_save_dir = '/data/jihye_data/cross-domain/post-train'
 
@@ -27,7 +25,4 @@ if __name__ == '__main__':
         _, domain, mode, _, _ = os.path.basename(post_filepath).split('_')
         save_dir = os.path.join(post_parent_save_dir, '{}_{}'.format(domain, mode))
         if not os.path.exists(save_dir): os.makedirs(save_dir)
-        if os.path.basename(save_dir) in TEMP_ALREADY_COMPLETED_DIRS: 
-            print('SKIP {}'.format(os.path.basename(save_dir)))
-            continue   # SKIP completed items.
         start_post_train(model_name_or_dir, post_filepath, save_dir)
