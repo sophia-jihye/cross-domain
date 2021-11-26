@@ -12,7 +12,7 @@ import finetuning_classification, reports
 
 TEMP_ALREADY_COMPLETED_ITEMS = True 
 
-post_trained_dirs = [d for d in glob('/data/jihye_data/cross-domain/data/post-train/*&*_*') if os.path.isdir(d)]
+post_trained_dirs = [d for d in glob('/data/jihye_data/cross-domain/post-train/*&*_*') if os.path.isdir(d)]
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 finetune_parent_save_dir = '/data/jihye_data/cross-domain/finetune_{}'
 kfold_num = 1
