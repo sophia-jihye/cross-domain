@@ -54,6 +54,7 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     relabel_dict, num_classes = {'negative':0, 'positive':1}, 2
     labeled_df = pd.read_json(mdsd_labeled_filepath)
+    print('Loaded {}'.format(mdsd_labeled_filepath))
     labeled_df['label'] = labeled_df['label'].apply(lambda x: relabel_dict[x])
     
     ####################################
@@ -65,6 +66,7 @@ if __name__ == '__main__':
         for source_domain in labeled_df['domain'].unique():
             
             model_name_or_dirs = [d for d in post_trained_dirs if source_domain in d]
+            print('Dirs: ', model_name_or_dirs)
             for model_name_or_dir in model_name_or_dirs:
                 
                 post_domain, post_option = os.path.basename(model_name_or_dir).split('_')
