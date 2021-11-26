@@ -51,6 +51,7 @@ def start_test(device, model_name_or_dir, df, save_dir):
     
 if __name__ == '__main__':        
 
+    finetuning_mode = 'UNK'   # RAW
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     relabel_dict, num_classes = {'negative':0, 'positive':1}, 2
     labeled_df = pd.read_json(mdsd_labeled_filepath)
@@ -81,13 +82,19 @@ if __name__ == '__main__':
                 train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
 
                 # (Raw source data)
-                train_texts, val_texts = train_df['text'].values, val_df['text'].values
+                if finetuning_mode == 'RAW':
+                    train_texts, val_texts = train_df['text'].values, val_df['text'].values
+                elif finetuning_mode == 'UNK':
+                    train_texts, val_texts = train_df['masked_text'].values, val_df['masked_text'].values
                 train_labels, val_labels = train_df['label'].values, val_df['label'].values
                 
                 start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
                 
                 # Test (Raw target data)
-                test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+                if finetuning_mode == 'RAW':
+                    test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+                elif finetuning_mode == 'UNK':
+                    test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['masked_text', 'label']])
                 test_df.columns = ['text', 'true_label']
                 
                 start_test(device, save_dir, test_df, save_dir)
@@ -111,13 +118,19 @@ if __name__ == '__main__':
                     train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, stratify=source_df['label'].values)
 
                     # (Raw source data)
-                    train_texts, val_texts = train_df['text'].values, val_df['text'].values
+                    if finetuning_mode == 'RAW':
+                        train_texts, val_texts = train_df['text'].values, val_df['text'].values
+                    elif finetuning_mode == 'UNK':
+                        train_texts, val_texts = train_df['masked_text'].values, val_df['masked_text'].values
                     train_labels, val_labels = train_df['label'].values, val_df['label'].values
 
                     start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
 
                     # Test (Raw target data)
-                    test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+                    if finetuning_mode == 'RAW':
+                        test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+                    elif finetuning_mode == 'UNK':
+                        test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['masked_text', 'label']])
                     test_df.columns = ['text', 'true_label']
 
                     start_test(device, save_dir, test_df, save_dir)
