@@ -14,7 +14,7 @@ post_trained_dirs = [d for d in glob('/data/jihye_data/cross-domain/post-train/*
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 finetune_parent_save_dir = '/data/jihye_data/cross-domain/finetune_{}'
 kfold_num = 5
-finetuning_mode = 'RAW'   # RAW, UNK
+finetuning_mode = 'UNK'   # RAW, UNK
 
 def start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir):
     tokenizer, model = load_tokenizer_and_model(model_name_or_dir, num_classes=num_classes, mode='classification')
@@ -63,7 +63,12 @@ if __name__ == '__main__':
     # The results we report are the averaged performance of each model across these 5 folds.
     for finetune_idx in range(kfold_num):
         for source_domain in labeled_df['domain'].unique():
+            source_df = labeled_df[labeled_df['domain']==source_domain]
             
+            # In each fold, 1600 balanced samples are randomly selected from the labeled data for training 
+            # and the rest 400 for validation.
+            train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
+
             model_name_or_dirs = [d for d in post_trained_dirs if source_domain in d]
             print('Dirs: ', model_name_or_dirs)
             for model_name_or_dir in model_name_or_dirs:
@@ -73,12 +78,7 @@ if __name__ == '__main__':
                 
                 save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, '-'.join([post_domain, post_option]), test_domain))
                 if not os.path.exists(save_dir): os.makedirs(save_dir)
-
-                source_df = labeled_df[labeled_df['domain']==source_domain]
                 
-                # In each fold, 1600 balanced samples are randomly selected from the labeled data for training and the rest 400 for validation.
-                train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
-
                 # (Raw source data)
                 if finetuning_mode == 'RAW':
                     train_texts, val_texts = train_df['text'].values, val_df['text'].values
