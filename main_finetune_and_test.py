@@ -100,34 +100,34 @@ if __name__ == '__main__':
     ##########################
     ###### No post-train #####
     ##########################
-    model_name_or_dir = 'bert-base-uncased'
-    for finetune_idx in range(kfold_num):
-        for source_domain in labeled_df['domain'].unique():
-            for test_domain in [d for d in labeled_df['domain'].unique() if d != source_domain]:
+#     model_name_or_dir = 'bert-base-uncased'
+#     for finetune_idx in range(kfold_num):
+#         for source_domain in labeled_df['domain'].unique():
+#             for test_domain in [d for d in labeled_df['domain'].unique() if d != source_domain]:
 
-                save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
-                if not os.path.exists(save_dir): os.makedirs(save_dir)
+#                 save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
+#                 if not os.path.exists(save_dir): os.makedirs(save_dir)
 
-                source_df = labeled_df[labeled_df['domain']==source_domain]
+#                 source_df = labeled_df[labeled_df['domain']==source_domain]
 
-                # In each fold, 1600 balanced samples are randomly selected from the labeled data for training and the rest 400 for validation.
-                train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, stratify=source_df['label'].values)
+#                 # In each fold, 1600 balanced samples are randomly selected from the labeled data for training and the rest 400 for validation.
+#                 train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, stratify=source_df['label'].values)
 
-                # (Raw source data)
-                if finetuning_mode == 'RAW':
-                    train_texts, val_texts = train_df['text'].values, val_df['text'].values
-                elif finetuning_mode == 'UNK':
-                    train_texts, val_texts = train_df['masked_text'].values, val_df['masked_text'].values
-                train_labels, val_labels = train_df['label'].values, val_df['label'].values
+#                 # (Raw source data)
+#                 if finetuning_mode == 'RAW':
+#                     train_texts, val_texts = train_df['text'].values, val_df['text'].values
+#                 elif finetuning_mode == 'UNK':
+#                     train_texts, val_texts = train_df['masked_text'].values, val_df['masked_text'].values
+#                 train_labels, val_labels = train_df['label'].values, val_df['label'].values
 
-                start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
+#                 start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
 
-                # Test (Raw target data)
-                if finetuning_mode == 'RAW':
-                    test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
-                elif finetuning_mode == 'UNK':
-                    test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['masked_text', 'label']])
-                test_df.columns = ['text', 'true_label']
+#                 # Test (Raw target data)
+#                 if finetuning_mode == 'RAW':
+#                     test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+#                 elif finetuning_mode == 'UNK':
+#                     test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['masked_text', 'label']])
+#                 test_df.columns = ['text', 'true_label']
 
-                start_test(device, save_dir, test_df, save_dir)
+#                 start_test(device, save_dir, test_df, save_dir)
             
