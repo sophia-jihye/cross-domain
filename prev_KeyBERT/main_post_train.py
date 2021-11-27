@@ -8,7 +8,10 @@ import post_training_mlm
 
 post_filepaths = glob('/data/jihye_data/cross-domain/data/MDSD_*&*_*_for_post.txt')
 post_parent_save_dir = '/data/jihye_data/cross-domain/post-train'
+
 post_trained_dirs = [d for d in glob(os.path.join(post_parent_save_dir, '*&*_*')) if os.path.isdir(d)]
+mdsd_labeled_filepath = '/media/dmlab/My Passport/DATA/cross-domain/data/MDSD_labeled.json'
+finetune_parent_save_dir = '/media/dmlab/My Passport/DATA/cross-domain/finetune_{}'
 
 def start_post_train(model_name_or_dir, post_filepath, save_dir):
     tokenizer, model = load_tokenizer_and_model(model_name_or_dir, mode='masking')
