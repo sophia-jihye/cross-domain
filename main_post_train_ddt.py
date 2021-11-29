@@ -39,7 +39,7 @@ if __name__ == '__main__':
     mode = 'MLM+DDT'
     
     for model_name_or_dir in post_trained_dirs:
-        post_domain, post_option = os.path.basename(model_name_or_dir).split('_')
+        post_domains, post_option = os.path.basename(model_name_or_dir).split('_')
         domain1, domain2 = post_domains.split('&')
         
         # domain1 -> domain2

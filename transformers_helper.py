@@ -28,7 +28,10 @@ class FeatureExtractor:
         try:
             feature = self.nlp(text)
         except:
-            text = text[:500]   # TEMP
+            # TEMP: tokenizer(text, truncation=True, padding='max_length', max_length=512).items() 한 다음에 
+            # 다시 raw text로 되돌려서 512 tokens 만큼의 text를 사용하는 게 가장 정석적인 방법일 듯
+            text = text[:500]   
+            
             feature = self.nlp(text)
         feature = np.squeeze(feature)
         return feature.mean(0)
