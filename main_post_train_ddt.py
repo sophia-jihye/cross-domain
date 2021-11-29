@@ -17,6 +17,11 @@ post_parent_save_dir = '/data/jihye_data/cross-domain/post-train'
 def prepare_data(source_domain, target_domain):
     post_filepath = post_filepath_format.format(source_domain, target_domain)
     post_df = pd.read_json(post_filepath)[['text', 'label']]
+    
+    # relabel
+    label_names = sorted(post_df['label'].unique())
+    label_to_idx = {label_names[idx]:idx for idx in range(len(label_names))}
+    post_df['label'] = post_df['label'].apply(lambda x: label_to_idx[x])
 
     train_df, val_df = train_test_split(post_df, test_size=.2, shuffle=True, \
         random_state=np.random.randint(1, 100), stratify=post_df['label'].values)
