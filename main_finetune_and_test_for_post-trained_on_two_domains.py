@@ -10,7 +10,7 @@ from transformers_helper import load_tokenizer_and_model
 from CustomDataset import CustomDataset, encode_for_inference
 import finetuning_classification, reports
 
-post_trained_dirs = sorted([d for d in glob('/data/jihye_data/cross-domain/post-train/source=*_target=*_MLM+DDT') if os.path.isdir(d)])
+post_trained_dirs = sorted([d for d in glob('/data/jihye_data/cross-domain/post-train/*&*_MLM') if os.path.isdir(d)])
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 finetune_parent_save_dir = '/data/jihye_data/cross-domain/finetune_{}'
 kfold_num = 1
@@ -61,29 +61,30 @@ if __name__ == '__main__':
     # For each task, we employ a 5-fold cross-validation protocol
     # The results we report are the averaged performance of each model across these 5 folds.
     for finetune_idx in range(kfold_num):
-        for model_name_or_dir in post_trained_dirs:
-            source, target, post_mode = os.path.basename(model_name_or_dir).split('_')
-            source_domain = source.replace('source=', '')
-            test_domain = target.replace('target=', '')
-            
+        for source_domain in labeled_df['domain'].unique():
             source_df = labeled_df[labeled_df['domain']==source_domain]
             
             # In each fold, 1600 balanced samples are randomly selected from the labeled data for training 
             # and the rest 400 for validation.
             train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
+            
+            model_name_or_dirs = [d for d in post_trained_dirs if source_domain in d]
+            for model_name_or_dir in model_name_or_dirs:
+                post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')
+                test_domain = post_domain.replace(source_domain, '').replace('&', '')
                 
-            save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
-            if not os.path.exists(save_dir): os.makedirs(save_dir)
+                save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
+                if not os.path.exists(save_dir): os.makedirs(save_dir)
 
-            train_texts, val_texts = train_df['text'].values, val_df['text'].values
-            train_labels, val_labels = train_df['label'].values, val_df['label'].values
+                train_texts, val_texts = train_df['text'].values, val_df['text'].values
+                train_labels, val_labels = train_df['label'].values, val_df['label'].values
 
-            start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
+                start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir)
 
-            test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
-            test_df.columns = ['text', 'true_label']
+                test_df = copy.copy(labeled_df[labeled_df['domain']==test_domain][['text', 'label']])
+                test_df.columns = ['text', 'true_label']
 
-            start_test(device, save_dir, test_df, save_dir)
+                start_test(device, save_dir, test_df, save_dir)
                 
     ##########################
     ###### No post-train #####
