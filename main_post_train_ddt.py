@@ -19,7 +19,7 @@ def prepare_data(source_domain, target_domain):
     post_df = pd.read_json(post_filepath)[['text', 'label']]
 
     train_df, val_df = train_test_split(post_df, test_size=.2, shuffle=True, \
-        random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
+        random_state=np.random.randint(1, 100), stratify=post_df['label'].values)
     train_texts, val_texts = train_df['text'].values, val_df['text'].values
     train_labels, val_labels = train_df['label'].values, val_df['label'].values
     return train_texts, train_labels, val_texts, val_labels
