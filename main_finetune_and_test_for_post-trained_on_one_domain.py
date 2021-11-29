@@ -61,19 +61,20 @@ if __name__ == '__main__':
     # For each task, we employ a 5-fold cross-validation protocol
     # The results we report are the averaged performance of each model across these 5 folds.
     for finetune_idx in range(kfold_num):
-        for source_domain in labeled_df['domain'].unique():
-            source_df = labeled_df[labeled_df['domain']==source_domain]
-            
-            # In each fold, 1600 balanced samples are randomly selected from the labeled data for training 
-            # and the rest 400 for validation.
-            train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
-            
-            model_name_or_dirs = [d for d in post_trained_dirs if source_domain in d]
+        for test_domain in labeled_df['domain'].unique():            
+    
+            model_name_or_dirs = [d for d in post_trained_dirs if test_domain in d]
             for model_name_or_dir in model_name_or_dirs:
                 post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')
                 
-                for test_domain in [d for d in labeled_df['domain'].unique() if d!=source_domain]:
-                
+                for source_domain in [d for d in labeled_df['domain'].unique() if d!=test_domain]:
+                    
+                    source_df = labeled_df[labeled_df['domain']==source_domain]
+            
+                    # In each fold, 1600 balanced samples are randomly selected from the labeled data for training 
+                    # and the rest 400 for validation.
+                    train_df, val_df = train_test_split(source_df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=source_df['label'].values)
+            
                     save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
                     if not os.path.exists(save_dir): os.makedirs(save_dir)
 
