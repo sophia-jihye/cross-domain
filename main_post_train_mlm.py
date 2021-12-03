@@ -6,7 +6,7 @@ from LazyLineByLineTextDataset import LazyLineByLineTextDataset
 from transformers_helper import load_tokenizer_and_model
 import post_training_mlm
 
-post_filepaths = glob('/data/jihye_data/cross-domain/data/MDSD_*_MLM_for_post.txt')
+post_filepaths = glob('/data/jihye_data/cross-domain/data/MDSD_*_*_for_post.txt')
 post_parent_save_dir = '/data/jihye_data/cross-domain/post-train'
 
 def start_post_train(model_name_or_dir, post_filepath, save_dir):
