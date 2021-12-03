@@ -16,6 +16,16 @@ def create_classification_report(labels, preds, accuracy, out_filepath):
     print('Created {}'.format(out_filepath))
     return report
 
+def get_average_classification_report(reports):
+    for i, report in enumerate(reports):
+        report.set_index(report.columns[0], inplace=True)
+        if i == 0: 
+            report_avg = report
+        else: 
+            report_avg = report_avg.add(report)
+    report_avg = report_avg / len(reports)
+    return report_avg
+
 def average_classification_report(report_filepaths):
     for i, report_filepath in enumerate(report_filepaths):
         report = pd.read_csv(report_filepath, header=0, index_col=0)

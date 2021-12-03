@@ -18,6 +18,7 @@ def load_tokenizer_and_model(model_name_or_path, num_classes=None, mode='classif
         
     return tokenizer, model
 
+# 주어진 문서의 BERT embedding 값을 구할 때 사용
 class FeatureExtractor:
     def __init__(self, pretrained_model_name):
         self.model = AutoModel.from_pretrained(pretrained_model_name)
@@ -34,4 +35,4 @@ class FeatureExtractor:
             
             feature = self.nlp(text)
         feature = np.squeeze(feature)
-        return feature.mean(0)
+        return feature.mean(0) # 평균을 취하는 방법을 택함
