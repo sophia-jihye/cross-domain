@@ -9,7 +9,7 @@ from CustomDataset import CustomDataset
 import finetuning_classification
 
 mdsd_unlabeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_unlabeled.json'
-finetune_parent_save_dir = '/data/jihye_data/cross-domain/domain-cls'
+parent_save_dir = '/data/jihye_data/cross-domain/domain-cls'
 
 def start_finetuning(model_name_or_dir, num_classes, train_texts, train_labels, val_texts, val_labels, save_dir):
     tokenizer, model = load_tokenizer_and_model(model_name_or_dir, num_classes=num_classes, mode='classification')
@@ -38,7 +38,7 @@ if __name__ == '__main__':
         relabel_dict = {val:i for i, val in enumerate(sorted(df['domain'].unique()))}
         df['domain'] = df['domain'].apply(lambda x: relabel_dict[x])
 
-        save_dir = os.path.join(finetune_parent_save_dir, '{}'.format('&'.join(sorted([domain1, domain2]))))
+        save_dir = os.path.join(parent_save_dir, '{}'.format('&'.join(sorted([domain1, domain2]))))
         if not os.path.exists(save_dir): os.makedirs(save_dir)
 
         train_df, val_df = train_test_split(df, test_size=.2, shuffle=True, random_state=np.random.randint(1, 100), stratify=df['domain'].values)
