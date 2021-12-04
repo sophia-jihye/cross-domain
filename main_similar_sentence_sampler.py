@@ -23,9 +23,8 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
         vec = feature_extractor.get_cls_embedding(text)
         records.append((text, vec))
     source_df = pd.DataFrame(records, columns=['text', 'dom-cls'])
-    source_df.reset_index(inplace=True)   # Reset index
-    filepath = os.path.join(domain_save_dir, '{}_{}_{}.json'.format('source', 'unlabeled', source_domain))
-    source_df.to_json(filepath)
+    filepath = os.path.join(domain_save_dir, '{}_{}_{}.csv'.format('source', 'unlabeled', source_domain))
+    source_df.to_csv(filepath, index=False)
     print('Created {}'.format(filepath))
 
     # Target texts from labeled data
@@ -41,9 +40,8 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
         records.append((text, vec, most_similar_text, most_similar_score))
 
     target_df = pd.DataFrame(records, columns=['text', 'dom-cls', 'most-similar_text', 'most-similar_score'])
-    target_df.reset_index(inplace=True)   # Reset index
-    filepath = os.path.join(domain_save_dir, '{}_{}_{}.json'.format('target', 'labeled', target_domain))
-    target_df.to_json(filepath)
+    filepath = os.path.join(domain_save_dir, '{}_{}_{}.csv'.format('target', 'labeled', target_domain))
+    target_df.to_csv(filepath, index=False)
     print('Created {}'.format(filepath))
     
 if __name__ == '__main__':        

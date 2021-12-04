@@ -30,7 +30,7 @@ class FeatureExtractor:
     def get_cls_embedding(self, text):
         input_ids, attention_mask = encode_for_inference(self.device, self.tokenizer, text)
         cls_feature = self.model(input_ids, attention_mask=attention_mask, return_dict=True, output_hidden_states=True)['hidden_states'][0] # Number of layers: 13   (initial [CLS] embeddings + 12 BERT layers)
-        return np.squeeze(cls_feature).mean(0) # 평균을 취하는 방법을 택함
+        return np.squeeze(cls_feature).mean(0).detach().cpu().numpy() # 평균을 취하는 방법을 택함
 
 # 주어진 문서의 BERT embedding 값을 구할 때 사용
 # class FeatureExtractor:
