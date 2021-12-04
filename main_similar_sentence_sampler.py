@@ -19,7 +19,7 @@ def cos_sim(A, B):
 def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_dir, labeled_df, target_domain):
     # Source texts from unlabeled data
     records = []
-    for text in unlabeled_df[unlabeled_df['domain']==source_domain]['text'].values:
+    for text in tqdm(unlabeled_df[unlabeled_df['domain']==source_domain]['text'].values):
         vec = feature_extractor.get_cls_embedding(text)
         records.append((text, vec))
     source_df = pd.DataFrame(records, columns=['text', 'dom-cls'])
