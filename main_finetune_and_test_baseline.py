@@ -67,40 +67,54 @@ if __name__ == '__main__':
     ###### Use post-trained models #####    
     for finetune_idx in range(kfold_num):
         for test_domain in labeled_df['domain'].unique():            
-            
-            #####################################
-            ###### Source+Target domain MLM #####
-            #####################################    
-            post_trained_dirs = sorted([d for d in glob('/data/jihye_data/cross-domain/post-train/*&*_ST') if os.path.isdir(d)])
-            model_name_or_dirs = [d for d in post_trained_dirs if test_domain in d]
+
+            ########################################
+            ###### SimSource+Target domain MLM #####
+            ########################################    
+            model_name_or_dirs = sorted([d for d in glob(\
+                '/data/jihye_data/cross-domain/post-train/source=*-target={}_SimST'.format(test_domain)) \
+                if os.path.isdir(d)])
             for model_name_or_dir in model_name_or_dirs:
                 post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')
-                source_domain = post_domain.replace(test_domain, '').replace('&', '')
+                source_domain = post_domain.split('-')[0].replace('source=', '')
                 save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
                 if not os.path.exists(save_dir): os.makedirs(save_dir)
 
                 do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
             
-            ##############################
-            ###### Target domain MLM #####
-            ##############################    
-            post_trained_dirs = sorted([d for d in glob('/data/jihye_data/cross-domain/post-train/*_T') if os.path.isdir(d)])
-            model_name_or_dirs = [d for d in post_trained_dirs if test_domain in d]
-            for model_name_or_dir in model_name_or_dirs:
-                post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')                
-                for source_domain in [d for d in labeled_df['domain'].unique() if d!=test_domain]:
-                    save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
-                    if not os.path.exists(save_dir): os.makedirs(save_dir)
+#             #####################################
+#             ###### Source+Target domain MLM #####
+#             #####################################    
+#             post_trained_dirs = sorted([d for d in glob('/data/jihye_data/cross-domain/post-train/*&*_ST') if os.path.isdir(d)])
+#             model_name_or_dirs = [d for d in post_trained_dirs if test_domain in d]
+#             for model_name_or_dir in model_name_or_dirs:
+#                 post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')
+#                 source_domain = post_domain.replace(test_domain, '').replace('&', '')
+#                 save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
+#                 if not os.path.exists(save_dir): os.makedirs(save_dir)
 
-                    do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
+#                 do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
+            
+#             ##############################
+#             ###### Target domain MLM #####
+#             ##############################    
+#             post_trained_dirs = sorted([d for d in glob('/data/jihye_data/cross-domain/post-train/*_T') if os.path.isdir(d)])
+#             model_name_or_dirs = [d for d in post_trained_dirs if test_domain in d]
+#             for model_name_or_dir in model_name_or_dirs:
+#                 post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')                
+#                 for source_domain in [d for d in labeled_df['domain'].unique() if d!=test_domain]:
+#                     save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post={}_target={}'.format(source_domain, post_mode, test_domain))
+#                     if not os.path.exists(save_dir): os.makedirs(save_dir)
+
+#                     do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
                 
-            ##########################
-            ###### No post-train #####
-            ##########################                
-            model_name_or_dir = 'bert-base-uncased'
-            for source_domain in [d for d in labeled_df['domain'].unique() if d != test_domain]:
-                save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
-                if not os.path.exists(save_dir): os.makedirs(save_dir)
+#             ##########################
+#             ###### No post-train #####
+#             ##########################                
+#             model_name_or_dir = 'bert-base-uncased'
+#             for source_domain in [d for d in labeled_df['domain'].unique() if d != test_domain]:
+#                 save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
+#                 if not os.path.exists(save_dir): os.makedirs(save_dir)
 
-                do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
+#                 do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
             
