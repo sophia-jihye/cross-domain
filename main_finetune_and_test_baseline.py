@@ -94,14 +94,11 @@ if __name__ == '__main__':
 
                     do_experiment(device, save_dir, model_name_or_dir, num_classes, labeled_df, source_domain, test_domain)
                 
-    ##########################
-    ###### No post-train #####
-    ##########################
-    model_name_or_dir = 'bert-base-uncased'
-    for finetune_idx in range(kfold_num):
-        for test_domain in labeled_df['domain'].unique():
+            ##########################
+            ###### No post-train #####
+            ##########################                
+            model_name_or_dir = 'bert-base-uncased'
             for source_domain in [d for d in labeled_df['domain'].unique() if d != test_domain]:
-
                 save_dir = os.path.join(finetune_parent_save_dir.format(finetune_idx), 'source={}_post=None_target={}'.format(source_domain, test_domain))
                 if not os.path.exists(save_dir): os.makedirs(save_dir)
 
