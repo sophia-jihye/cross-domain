@@ -24,6 +24,8 @@ class FeatureExtractor:
     def __init__(self, model_name_or_dir, device):
         self.tokenizer, self.model = load_tokenizer_and_model(model_name_or_dir)
         self.device = device
+        self.model = self.model.to(self.device)
+        self.model.eval()
     
     def get_cls_embedding(self, text):
         input_ids, attention_mask = encode_for_inference(self.device, self.tokenizer, text)
