@@ -27,8 +27,8 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
     source_df.to_csv(filepath, index=False)
     print('Created {}'.format(filepath))
 
-    records = []
     # Target texts from labeled data
+    records = []
     for text in tqdm(labeled_df[labeled_df['domain']==target_domain]['text'].values):
         vec = feature_extractor.get_cls_embedding(text)
 
@@ -38,18 +38,6 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
         source_df.drop(columns=['cos'], inplace=True)
 
         records.append(('labeled', text, vec, most_similar_text, most_similar_score))
-
-    # Target texts from unlabeled data
-#     for text in tqdm(unlabeled_df[unlabeled_df['domain']==target_domain]['text'].values):
-#         vec = feature_extractor.get_cls_embedding(text)
-
-#         source_df['cos'] = source_df['dom-cls'].apply(lambda x: cos_sim(vec, x))
-#         most_similar_row = source_df.sort_values(by=['cos'], ascending=False, axis=0).iloc[0]
-#         most_similar_text, most_similar_score = most_similar_row['text'], most_similar_row['cos']
-#         source_df.drop(columns=['cos'], inplace=True)
-
-#         records.append(('unlabeled', text, vec, most_similar_text, most_similar_score))
-
         
     target_df = pd.DataFrame(records, columns=['from', 'text', 'dom-cls', 'most-similar_text', 'most-similar_score'])
     filepath = os.path.join(domain_save_dir, '{}_{}.csv'.format('target', target_domain))
