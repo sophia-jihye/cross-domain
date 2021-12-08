@@ -19,20 +19,16 @@ def cos_sim(A, B):
 
 def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_dir, labeled_df, target_domain):
     
-    filepath = os.path.join(domain_save_dir, '{}_{}.csv'.format('source', source_domain))
-    if os.path.exists(filepath):
-        source_df = pd.read_csv(filepath)
-    
-    else:
-        # Source texts from unlabeled data
-        records = []
-        for text in tqdm(unlabeled_df[unlabeled_df['domain']==source_domain]['text'].values):
-            vec = feature_extractor.get_cls_embedding(text)
-            records.append(('unlabeled', text, vec))
-        source_df = pd.DataFrame(records, columns=['from', 'text', 'dom-cls'])
+    # Source texts from unlabeled data
+    records = []
+    for text in tqdm(unlabeled_df[unlabeled_df['domain']==source_domain]['text'].values):
+        vec = feature_extractor.get_cls_embedding(text)
+        records.append(('unlabeled', text, vec))
+    source_df = pd.DataFrame(records, columns=['from', 'text', 'dom-cls'])
 
-        source_df.to_csv(filepath, index=False)
-        print('Created {}'.format(filepath))
+    filepath = os.path.join(domain_save_dir, '{}_{}.csv'.format('source', source_domain))
+    source_df.to_csv(filepath, index=False)
+    print('Created {}'.format(filepath))
 
     if cos_score_threshold is None: # Get the most similar document
         records = []
