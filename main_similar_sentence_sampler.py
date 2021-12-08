@@ -12,7 +12,7 @@ from transformers_helper import FeatureExtractor
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 mdsd_unlabeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_unlabeled.json'
 domain_save_dirs = glob('/data/jihye_data/cross-domain/domain-cls/*')
-cos_score_threshold = 0.9 # None
+cos_score_threshold = 0.95 # None
 
 def cos_sim(A, B):
        return dot(A, B)/(norm(A)*norm(B))
