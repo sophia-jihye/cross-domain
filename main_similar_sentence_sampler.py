@@ -12,7 +12,7 @@ from transformers_helper import FeatureExtractor
 mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
 mdsd_unlabeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_unlabeled.json'
 domain_save_dirs = glob('/data/jihye_data/cross-domain/domain-cls/*')
-cos_score_threshold = 0.95 # None
+cos_score_threshold = 5 # 0.95 # None
 
 def cos_sim(A, B):
        return dot(A, B)/(norm(A)*norm(B))
@@ -59,7 +59,7 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
         target_df.to_csv(filepath, index=False)
         print('Created {}'.format(filepath))
     
-    else:
+    elif type(cos_score_threshold) is float:
         # Target texts from labeled data
         records = set()
         for text in tqdm(labeled_df[labeled_df['domain']==target_domain]['text'].values):
@@ -72,6 +72,24 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
         target_df = pd.DataFrame(list(records), columns=['most-similar_text'])
         target_df['from'] = 'labeled'
         filepath = os.path.join(domain_save_dir, '{}-{}_{}.csv'.format('target', cos_score_threshold, target_domain))
+        target_df.to_csv(filepath, index=False)
+        print('Created {}'.format(filepath))        
+        
+    elif type(cos_score_threshold) is int:
+        records = []
+        # Target texts from labeled data
+        for text in tqdm(labeled_df[labeled_df['domain']==target_domain]['text'].values):
+            vec = feature_extractor.get_cls_embedding(text)
+
+            source_df['cos'] = source_df['dom-cls'].apply(lambda x: cos_sim(vec, x))
+            for _, row in source_df.sort_values(by=['cos'], \
+                                        ascending=False, axis=0).iloc[:cos_score_threshold].iterrows():
+                records.append(('labeled', text, vec, row['text'], row['cos'])) 
+                
+            source_df.drop(columns=['cos'], inplace=True)
+
+        target_df = pd.DataFrame(records, columns=['from', 'text', 'dom-cls', 'most-similar_text', 'most-similar_score'])
+        filepath = os.path.join(domain_save_dir, '{}_{}.csv'.format('target', target_domain))
         target_df.to_csv(filepath, index=False)
         print('Created {}'.format(filepath))        
     
