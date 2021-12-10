@@ -9,10 +9,10 @@ tqdm.pandas()
 
 from transformers_helper import FeatureExtractor
 
-mdsd_labeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_labeled.json'
-mdsd_unlabeled_filepath = '/data/jihye_data/cross-domain/data/MDSD_unlabeled.json'
-domain_save_dirs = glob('/data/jihye_data/cross-domain/domain-cls/*')
-cos_score_threshold = 5 # 0.95 # None
+mdsd_labeled_filepath = '/media/dmlab/My Passport/DATA/cross-domain/data/MDSD_labeled.json'
+mdsd_unlabeled_filepath = '/media/dmlab/My Passport/DATA/cross-domain/data/MDSD_unlabeled.json'
+domain_save_dirs = glob('/media/dmlab/My Passport/DATA/cross-domain/domain-cls/*')
+cos_score_threshold = 2 # 0.95 # None
 
 def cos_sim(A, B):
        return dot(A, B)/(norm(A)*norm(B))
@@ -89,9 +89,9 @@ def do_experiment(unlabeled_df, source_domain, feature_extractor, domain_save_di
             source_df.drop(columns=['cos'], inplace=True)
 
         target_df = pd.DataFrame(records, columns=['from', 'text', 'dom-cls', 'most-similar_text', 'most-similar_score'])
-        filepath = os.path.join(domain_save_dir, '{}_{}.csv'.format('target', target_domain))
+        filepath = os.path.join(domain_save_dir, '{}-{}_{}.csv'.format('target', cos_score_threshold, target_domain))
         target_df.to_csv(filepath, index=False)
-        print('Created {}'.format(filepath))        
+        print('Created {}'.format(filepath))         
     
 if __name__ == '__main__':        
     
