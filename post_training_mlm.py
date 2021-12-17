@@ -7,7 +7,7 @@ def train(tokenizer, model, dataset, save_dir, mlm_prob=0.15):
     training_args = TrainingArguments(
         output_dir = save_dir,
         num_train_epochs = 5,
-        per_device_train_batch_size = 4,
+        per_device_train_batch_size = 1,
         save_steps = 10000,
         save_total_limit = 1,
     )
