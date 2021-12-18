@@ -72,7 +72,7 @@ if __name__ == '__main__':
             ###### SimSource+Target domain MLM #####
             ########################################    
             model_name_or_dirs = sorted([d for d in glob(\
-                '/data/jihye_data/cross-domain/post-train/source=*-target={}_SimST*'.format(test_domain)) \
+                '/data/jihye_data/cross-domain/post-train/source=*-target={}_SimST-2'.format(test_domain)) \
                 if os.path.isdir(d)])
             for model_name_or_dir in model_name_or_dirs:
                 post_domain, post_mode = os.path.basename(model_name_or_dir).split('_')
